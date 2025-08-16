@@ -67,7 +67,6 @@ AfamaGo/
 - [Node.js 18+](https://nodejs.org/)
 - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
 - [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
-- [Docker](https://www.docker.com/get-started) (for containerization)
 
 ### Local Development Setup
 
@@ -95,7 +94,7 @@ AfamaGo/
    cd src/Api.Host
    dotnet run
    ```
-   The API will be available at `https://localhost:7071`
+   The API will be available at `https://localhost:5001`
 
 5. **Frontend Setup** (when available)
    ```bash
@@ -145,8 +144,7 @@ This project uses Azure Developer CLI for streamlined deployment:
 - **Azure Bicep**: Infrastructure as Code
 - **GitHub Actions**: CI/CD pipeline
 - **Azure Developer CLI**: Deployment automation
-- **Docker**: Containerization
-- **Azure Container Registry**: Container image storage
+- **Azure Container Registry**: Container image storage (if needed)
 
 ## 🧪 Testing Strategy
 
@@ -185,7 +183,7 @@ The project uses GitHub Actions for automated CI/CD:
    - Code quality checks
    - Automated testing
    - Security scanning
-   - Docker image building
+   - Build verification
 
 2. **Continuous Deployment**
    - Infrastructure provisioning
@@ -196,7 +194,7 @@ The project uses GitHub Actions for automated CI/CD:
 ## 📝 API Documentation
 
 The API is fully documented using OpenAPI/Swagger. When running locally, visit:
-- Development: `https://localhost:7071/swagger`
+- Development: `https://localhost:5001/swagger`
 - Production: `https://your-app-name.azurewebsites.net/swagger`
 
 ## 🤝 Contributing
