@@ -18,8 +18,6 @@ public static class DependencyInjection
 
         builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
-
-        // Customise default API behaviour
         builder.Services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);
 
@@ -31,14 +29,17 @@ public static class DependencyInjection
         });
     }
 
-    public static void AddKeyVaultIfConfigured(this IHostApplicationBuilder builder)
+    public static void AddAzureAppConfiguration(this IHostApplicationBuilder builder)
     {
-        var keyVaultUri = builder.Configuration["AZURE_KEY_VAULT_ENDPOINT"];
-        if (!string.IsNullOrWhiteSpace(keyVaultUri))
+        if (!builder.Environment.IsDevelopment())
         {
-            builder.Configuration.AddAzureKeyVault(
-                new Uri(keyVaultUri),
-                new DefaultAzureCredential());
+            var azAppConfigUri = new Uri($"https://{builder.Configuration["AzureAppConfig:InstanceName"]}.azconfig.io");
+            builder.Configuration.AddAzureAppConfiguration(options => options.Connect(azAppConfigUri, new ManagedIdentityCredential())
+            .ConfigureKeyVault(kv => kv.SetCredential(new ManagedIdentityCredential())));
+        }
+        else
+        {
+            builder.Configuration.AddUserSecrets<Program>();
         }
     }
 }

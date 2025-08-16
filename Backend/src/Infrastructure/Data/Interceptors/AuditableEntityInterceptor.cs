@@ -43,6 +43,14 @@ public class AuditableEntityInterceptor(
                 entry.Entity.LastModifiedBy = _user.Id;
                 entry.Entity.LastModified = utcNow;
             }
+
+            if (entry.State == EntityState.Deleted)
+            {
+                entry.Entity.IsDeleted = true;
+                entry.Entity.Deleted = _dateTime.GetUtcNow();
+                entry.Entity.DeletedBy = _user.Id;
+                entry.State = EntityState.Modified;
+            }
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Afama.Go.Api.Application.Common.Behaviours;
-using Afama.Go.Api.Application.Common.Interfaces;
-using Microsoft.Extensions.Logging;
+﻿using Afama.Go.Api.Application.Common.Interfaces;
 using Moq;
 using NUnit.Framework;
 

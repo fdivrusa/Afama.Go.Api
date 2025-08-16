@@ -1,8 +1,6 @@
 ﻿using Afama.Go.Api.Application.Common.Interfaces;
-using Afama.Go.Api.Domain.Constants;
 using Afama.Go.Api.Infrastructure.Data;
 using Afama.Go.Api.Infrastructure.Data.Interceptors;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -30,8 +28,5 @@ public static class DependencyInjection
         builder.Services.AddScoped<ApplicationDbContextInitialiser>();
 
         builder.Services.AddSingleton(TimeProvider.System);
-
-        // Azure AD B2C/Entra ID Authentication will be configured in Web layer
-        builder.Services.AddAuthorization(options => options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
     }
 }

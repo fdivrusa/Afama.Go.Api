@@ -36,9 +36,8 @@
       <PackageReference Include="System.Configuration.ConfigurationManager" />
       <PackageReference Include="Testcontainers.MsSql" />
     </ItemGroup>
-    
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Web\Web.csproj" />
+      <ProjectReference Include="..\..\src\Api.Host\Api.Host.csproj" />
     </ItemGroup>
 
 </Project>

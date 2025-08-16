@@ -1,5 +1,4 @@
 ﻿using System.Data.Common;
-using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Infrastructure.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -8,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-
-using static Testing;
 
 namespace Afama.Go.Api.Application.FunctionalTests;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>

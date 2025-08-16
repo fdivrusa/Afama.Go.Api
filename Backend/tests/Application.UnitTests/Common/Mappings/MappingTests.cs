@@ -1,10 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using Afama.Go.Api.Application.Common.Interfaces;
-using Afama.Go.Api.Application.Common.Models;
-using Afama.Go.Api.Application.TodoItems.Queries.GetTodoItemsWithPagination;
-using Afama.Go.Api.Application.TodoLists.Queries.GetTodos;
-using Afama.Go.Api.Domain.Entities;
 using AutoMapper;
 using NUnit.Framework;
 
@@ -28,18 +24,13 @@ public class MappingTests
         _configuration.AssertConfigurationIsValid();
     }
 
-    [Test]
-    [TestCase(typeof(TodoList), typeof(TodoListDto))]
-    [TestCase(typeof(TodoItem), typeof(TodoItemDto))]
-    [TestCase(typeof(TodoList), typeof(LookupDto))]
-    [TestCase(typeof(TodoItem), typeof(LookupDto))]
-    [TestCase(typeof(TodoItem), typeof(TodoItemBriefDto))]
-    public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
-    {
-        var instance = GetInstanceOf(source);
+    //[Test]
+    //public void ShouldSupportMappingFromSourceToDestination(Type source, Type destination)
+    //{
+    //    var instance = GetInstanceOf(source);
 
-        _mapper.Map(instance, source, destination);
-    }
+    //    _mapper.Map(instance, source, destination);
+    //}
 
     private object GetInstanceOf(Type type)
     {
