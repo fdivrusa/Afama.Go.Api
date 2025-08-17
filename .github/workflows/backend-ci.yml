@@ -9,6 +9,11 @@ on:
     paths: ["Backend/**"]
   workflow_dispatch:
 
+permissions:
+  contents: read    # Read repository contents
+  actions: read     # Read action artifacts
+  checks: write     # Write check runs (needed for test reporter)
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -84,7 +89,7 @@ jobs:
           path: Backend/TestResults/**/*.trx
 
       - name: Publish test results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v1.9.1
         if: always()
         with:
           name: Test Results

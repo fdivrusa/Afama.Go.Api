@@ -89,7 +89,7 @@ public class MembersEndpointsTests
             Email = "john.doe@example.com",
             PhoneNumber = "+1234567890",
             MemberType = "Student",
-            DateOfBirth = new DateTime(1990, 1, 1),
+            BirthDate = new DateTime(1990, 1, 1),
             CreatedAt = DateTime.UtcNow.AddDays(-30),
             UpdatedAt = DateTime.UtcNow.AddDays(-1)
         };
