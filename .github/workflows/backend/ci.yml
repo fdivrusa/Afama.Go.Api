@@ -2,10 +2,10 @@ name: Backend Build and Test
 
 on:
   push:
-    branches: [master, develop]
+    branches: [main, master, develop]
     paths: ["Backend/**"]
   pull_request:
-    branches: [master]
+    branches: [main, master]
     paths: ["Backend/**"]
   workflow_dispatch:
 
