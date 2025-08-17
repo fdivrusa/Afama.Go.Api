@@ -39,6 +39,7 @@ public class AuditableEntityInterceptor(
                 {
                     entry.Entity.CreatedBy = _user.Id;
                     entry.Entity.Created = utcNow;
+                    entry.Entity.IsDeleted = false;
                 }
                 entry.Entity.LastModifiedBy = _user.Id;
                 entry.Entity.LastModified = utcNow;

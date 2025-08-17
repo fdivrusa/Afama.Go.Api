@@ -5,6 +5,12 @@ public abstract class BaseEntity
 {
     public Guid Id { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public DateTimeOffset? Deleted { get; set; }
+
+    public string? DeletedBy { get; set; }
+
     private readonly List<BaseEvent> _domainEvents = [];
 
     [NotMapped]

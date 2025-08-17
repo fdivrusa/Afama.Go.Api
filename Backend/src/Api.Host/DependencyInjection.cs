@@ -1,6 +1,6 @@
 ﻿using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Infrastructure.Data;
-using Afama.Go.Api.Web.Services;
+using Afama.Go.Api.Host.Services;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,8 +15,6 @@ public static class DependencyInjection
 
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>();
-
-        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
         builder.Services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);

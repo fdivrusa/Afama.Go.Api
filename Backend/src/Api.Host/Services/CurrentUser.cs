@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Afama.Go.Api.Application.Common.Interfaces;
 
-namespace Afama.Go.Api.Web.Services;
+namespace Afama.Go.Api.Host.Services;
 
 public class CurrentUser(IHttpContextAccessor httpContextAccessor) : IUser
 {

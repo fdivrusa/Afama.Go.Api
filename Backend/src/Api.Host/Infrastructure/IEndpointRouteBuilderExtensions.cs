@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Afama.Go.Api.Web.Infrastructure;
+namespace Afama.Go.Api.Host.Infrastructure;
 public static class IEndpointRouteBuilderExtensions
 {
     public static IEndpointRouteBuilder MapGet(this IEndpointRouteBuilder builder, Delegate handler, [StringSyntax("Route")] string pattern = "")

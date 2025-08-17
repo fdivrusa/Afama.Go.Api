@@ -1,9 +1,6 @@
 using System.Globalization;
-using System.Net;
 using Afama.Go.Api.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
@@ -74,6 +71,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddProblemDetails();
+
 try
 {
     Log.Information("Initialising application");
@@ -106,39 +105,6 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.UseSerilogRequestLogging();
-    app.UseExceptionHandler(options =>
-    {
-        options.Run(async context =>
-        {
-            var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
-
-            if (exception != null)
-            {
-                var request = context.Request;
-                var errorResponse = new
-                {
-                    message = exception.Message,
-                    stackTrace = app.Environment.IsDevelopment() ? exception.StackTrace : null,
-                    exceptionType = exception.GetType().ToString(),
-                    path = request.Path,
-                    method = request.Method,
-                    timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"),
-                    requestId = context.TraceIdentifier
-                };
-
-                Log.Error(exception, "An unhandled exception occurred");
-
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (exception is InvalidOperationException) ? (int)HttpStatusCode.BadRequest : (int)HttpStatusCode.InternalServerError;
-
-                await context.Response.WriteAsJsonAsync(errorResponse);
-            }
-        });
-    });
-
-    app.MapEndpoints();
-
     app.UseRequestLocalization(options =>
     {
         options.DefaultRequestCulture = new RequestCulture(supportedLanguages[0]);
@@ -147,6 +113,12 @@ try
         options.SupportedCultures = supportedLanguagesCultures;
         options.SupportedUICultures = supportedLanguagesCultures;
     });
+
+    app.UseSerilogRequestLogging();
+    
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+
+    app.MapEndpoints();
     app.Run();
 }
 catch (Exception ex)

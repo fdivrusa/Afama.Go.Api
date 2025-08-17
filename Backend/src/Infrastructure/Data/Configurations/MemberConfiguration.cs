@@ -22,6 +22,6 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
             .HasMaxLength(48);
         builder.Property(m => m.KnownPathologies)
             .IsRequired(false)
-            .HasMaxLength(1024);
+            .HasMaxLength(2048);
     }
 }

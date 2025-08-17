@@ -1,0 +1,92 @@
+name: Backend Build and Test
+
+on:
+  push:
+    branches: [master, develop]
+    paths: ["Backend/**"]
+  pull_request:
+    branches: [master]
+    paths: ["Backend/**"]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: "Backend/global.json"
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore Afama.Go.Api.sln
+
+      - name: Build solution
+        run: dotnet build Afama.Go.Api.sln --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: |
+          dotnet test tests/Application.UnitTests/Application.UnitTests.csproj \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --logger trx \
+            --results-directory TestResults/UnitTests
+
+      - name: Run Domain Unit Tests
+        run: |
+          dotnet test tests/Domain.UnitTests/Domain.UnitTests.csproj \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --logger trx \
+            --results-directory TestResults/DomainTests
+
+      - name: Run Infrastructure Integration Tests
+        run: |
+          dotnet test tests/Infrastructure.IntegrationTests/Infrastructure.IntegrationTests.csproj \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --logger trx \
+            --results-directory TestResults/IntegrationTests
+
+      - name: Run Functional Tests
+        run: |
+          dotnet test tests/Application.FunctionalTests/Application.FunctionalTests.csproj \
+            --configuration Release \
+            --no-build \
+            --verbosity normal \
+            --logger trx \
+            --results-directory TestResults/FunctionalTests
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: Backend/TestResults/**/*.trx
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test Results
+          path: Backend/TestResults/**/*.trx
+          reporter: dotnet-trx

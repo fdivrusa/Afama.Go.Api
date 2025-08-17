@@ -1,0 +1,112 @@
+using System.Text.Json;
+using FluentValidation;
+
+namespace Afama.Go.Api.Host.Infrastructure;
+
+public class GlobalExceptionMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<GlobalExceptionMiddleware> _logger;
+    private readonly IWebHostEnvironment _environment;
+
+    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger, IWebHostEnvironment environment)
+    {
+        _next = next;
+        _logger = logger;
+        _environment = environment;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception exception)
+        {
+            await HandleExceptionAsync(context, exception);
+        }
+    }
+
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var (statusCode, errorCode) = GetErrorDetails(exception);
+
+        var errorResponse = new ErrorResponse
+        {
+            Message = GetUserFriendlyMessage(exception),
+            Code = errorCode,
+            Path = context.Request.Path,
+            Method = context.Request.Method,
+            Timestamp = DateTime.UtcNow,
+            RequestId = context.TraceIdentifier,
+            StackTrace = _environment.IsDevelopment() ? exception.StackTrace : null
+        };
+
+        _logger.LogError(exception,
+            "Unhandled exception for {Method} {Path} by {User}. Error: {ErrorCode}",
+            context.Request.Method,
+            context.Request.Path,
+            context.User.Identity?.Name ?? "Anonymous",
+            errorCode);
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = statusCode;
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = _environment.IsDevelopment()
+        };
+
+        var json = JsonSerializer.Serialize(errorResponse, options);
+        await context.Response.WriteAsync(json);
+    }
+
+    private static (int statusCode, string errorCode) GetErrorDetails(Exception exception)
+    {
+        return exception switch
+        {
+            ArgumentNullException => (400, "InvalidArgument"),
+            ArgumentException => (400, "InvalidArgument"),
+            InvalidOperationException => (400, "InvalidOperation"),
+            ValidationException => (400, "ValidationFailed"),
+            UnauthorizedAccessException => (401, "Unauthorized"),
+            KeyNotFoundException => (404, "NotFound"),
+            NotImplementedException => (501, "NotImplemented"),
+            TimeoutException => (408, "Timeout"),
+            TaskCanceledException => (408, "Timeout"),
+            NotFoundException => (404, "NotFound"),
+            _ => (500, "InternalError")
+        };
+    }
+
+    private static string GetUserFriendlyMessage(Exception exception)
+    {
+        return exception switch
+        {
+            ArgumentNullException => "Required parameter is missing.",
+            ArgumentException => "Invalid request parameters.",
+            InvalidOperationException => "The requested operation is not valid.",
+            ValidationException validationEx => validationEx.Message,
+            UnauthorizedAccessException => "Access denied.",
+            KeyNotFoundException => "The requested resource was not found.",
+            NotImplementedException => "This feature is not yet implemented.",
+            TimeoutException => "The request timed out.",
+            TaskCanceledException => "The request was cancelled or timed out.",
+            NotFoundException => "The requested resource was not found.",
+            _ => "An internal server error occurred. Please try again later."
+        };
+    }
+}
+
+public record ErrorResponse
+{
+    public string Message { get; init; } = string.Empty;
+    public string Code { get; init; } = string.Empty;
+    public string Path { get; init; } = string.Empty;
+    public string Method { get; init; } = string.Empty;
+    public DateTime Timestamp { get; init; }
+    public string RequestId { get; init; } = string.Empty;
+    public string? StackTrace { get; init; }
+}

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Afama.Go.Api.Web.Infrastructure;
+namespace Afama.Go.Api.Host.Infrastructure;
 public static class MethodInfoExtensions
 {
     public static bool IsAnonymous(this MethodInfo method)

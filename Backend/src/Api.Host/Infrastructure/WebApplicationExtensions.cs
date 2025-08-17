@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Afama.Go.Api.Web.Infrastructure;
+namespace Afama.Go.Api.Host.Infrastructure;
 public static class WebApplicationExtensions
 {
     public static RouteGroupBuilder MapGroup(this WebApplication app, EndpointGroupBase group)

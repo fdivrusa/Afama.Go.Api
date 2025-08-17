@@ -1,4 +1,4 @@
-﻿namespace Afama.Go.Api.Web.Infrastructure;
+﻿namespace Afama.Go.Api.Host.Infrastructure;
 
 public abstract class EndpointGroupBase
 {
