@@ -1,7 +1,9 @@
 # AfamaGo - Ki-Do-Kaï Club Management System
 
-[![Build Status](https://github.com/fdivrusa/Afama.Go.Api/workflows/ci/badge.svg)](https://github.com/fdivrusa/Afama.Go.Api/actions)
-[![Azure Dev](https://img.shields.io/badge/Azure-Ready-blue)](https://azure.microsoft.com)
+[![Build Status](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml/badge.svg?branch=master)](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml)
+[![Test Results](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml/badge.svg?branch=master&event=push)](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml)
+[![.NET Version](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/download/dotnet/8.0)
+
 
 AfamaGo is a modern club management system designed specifically for the Ki-Do-Kaï club, practicing Tai-Jitsu KJR style within the AFAMA federation in Belgium. This project serves as both a practical solution for club administration and a learning platform to explore and implement various Azure services and modern web development practices.
 
@@ -15,6 +17,20 @@ This application is designed to manage various aspects of the Ki-Do-Kaï club pr
 - Administrative functions
 
 **Note**: This is a personal learning project focused on exploring Azure technologies rather than a commercial venture.
+
+## 📊 Build & Test Status
+
+| Branch | Build Status | Test Results | Last Updated |
+|--------|-------------|--------------|--------------|
+| master | [![Build](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml/badge.svg?branch=master)](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml) | [![Tests](https://img.shields.io/github/actions/workflow/status/fdivrusa/AfamaGo/backend-ci.yml?branch=master&label=tests)](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml) | ![Last Commit](https://img.shields.io/github/last-commit/fdivrusa/AfamaGo/master) |
+| develop | [![Build](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml/badge.svg?branch=develop)](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml) | [![Tests](https://img.shields.io/github/actions/workflow/status/fdivrusa/AfamaGo/backend-ci.yml?branch=develop&label=tests)](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml) | ![Last Commit](https://img.shields.io/github/last-commit/fdivrusa/AfamaGo/develop) |
+
+### Test Coverage
+- **Unit Tests**: Application & Domain layers
+- **Integration Tests**: Infrastructure & Database
+- **Functional Tests**: End-to-end API scenarios
+- **Test Results**: View detailed test reports in [GitHub Actions](https://github.com/fdivrusa/AfamaGo/actions/workflows/backend-ci.yml)
+
 
 ## 🏗️ Architecture Overview
 
