@@ -1,6 +1,8 @@
 using Afama.Go.Api.Application.Members.Commands;
 using Afama.Go.Api.Application.Members.Queries.GetMemberDetails;
 using Afama.Go.Api.Application.Members.Queries.GetMembers;
+using Afama.Go.Api.Host.Endpoints;
+using MembersEndpoint = Afama.Go.Api.Host.Endpoints.Members;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -13,13 +15,13 @@ namespace Afama.Go.Api.Application.UnitTests.Members.Endpoints;
 public class MembersEndpointsTests
 {
     private Mock<ISender> _mockSender;
-    private Host.Endpoints.Members _membersEndpoint;
+    private MembersEndpoint _membersEndpoint;
 
     [SetUp]
     public void SetUp()
     {
         _mockSender = new Mock<ISender>();
-        _membersEndpoint = new Host.Endpoints.Members();
+        _membersEndpoint = new MembersEndpoint();
     }
 
     [Test]
@@ -148,8 +150,16 @@ public class MembersEndpointsTests
 
         var expectedMemberId = Guid.NewGuid();
 
-        _mockSender.Setup(x => x.Send(command, It.IsAny<CancellationToken>()))
-                   .ReturnsAsync(expectedMemberId);
+        _mockSender.Setup(x => x.Send(It.Is<CreateMemberCommand>(c =>
+                c.FirstName == command.FirstName &&
+                c.LastName == command.LastName &&
+                c.Email == command.Email &&
+                c.PhoneNumber == command.PhoneNumber &&
+                c.MemberType == command.MemberType &&
+                c.BirthDate == command.BirthDate &&
+                c.KnownPathologies == command.KnownPathologies),
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedMemberId);
 
         // Act
         var result = await _membersEndpoint.CreateMember(_mockSender.Object, command);
@@ -158,7 +168,7 @@ public class MembersEndpointsTests
         result.Should().BeOfType<Created<Guid>>();
         result.Value.Should().Be(expectedMemberId);
         result.Location.Should().Be($"/{nameof(Members)}/{expectedMemberId}");
-        _mockSender.Verify(x => x.Send(command, It.IsAny<CancellationToken>()), Times.Once);
+        _mockSender.Verify(x => x.Send(It.IsAny<CreateMemberCommand>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
@@ -177,14 +187,30 @@ public class MembersEndpointsTests
         };
 
         var memberId = Guid.NewGuid();
-        _mockSender.Setup(x => x.Send(command, It.IsAny<CancellationToken>()))
-                   .ReturnsAsync(memberId);
+        _mockSender.Setup(x => x.Send(It.Is<CreateMemberCommand>(c =>
+                c.FirstName == command.FirstName &&
+                c.LastName == command.LastName &&
+                c.Email == command.Email &&
+                c.PhoneNumber == command.PhoneNumber &&
+                c.MemberType == command.MemberType &&
+                c.BirthDate == command.BirthDate &&
+                c.KnownPathologies == command.KnownPathologies),
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(memberId);
 
         // Act
         await _membersEndpoint.CreateMember(_mockSender.Object, command);
 
         // Assert
-        _mockSender.Verify(x => x.Send(command, It.IsAny<CancellationToken>()), Times.Once);
+        _mockSender.Verify(x => x.Send(It.Is<CreateMemberCommand>(c =>
+                c.FirstName == command.FirstName &&
+                c.LastName == command.LastName &&
+                c.Email == command.Email &&
+                c.PhoneNumber == command.PhoneNumber &&
+                c.MemberType == command.MemberType &&
+                c.BirthDate == command.BirthDate &&
+                c.KnownPathologies == command.KnownPathologies),
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Test]
@@ -201,7 +227,7 @@ public class MembersEndpointsTests
         };
 
         var memberId = Guid.NewGuid();
-        _mockSender.Setup(x => x.Send(command, It.IsAny<CancellationToken>()))
+        _mockSender.Setup(x => x.Send(It.IsAny<CreateMemberCommand>(), It.IsAny<CancellationToken>()))
                    .ReturnsAsync(memberId);
 
         // Act
@@ -209,6 +235,51 @@ public class MembersEndpointsTests
 
         // Assert
         result.Location.Should().Be($"/Members/{memberId}");
+    }
+
+    [Test]
+    public async Task UpdateMember_Should_Call_Sender_With_Command_And_Return_NoContent()
+    {
+        var id = Guid.NewGuid();
+        var command = new UpdateMemberCommand
+        {
+            FirstName = "New",
+            LastName = "Name",
+            Email = "new@example.com",
+            PhoneNumber = "+1",
+            MemberType = Domain.Enums.MemberType.Student
+        };
+
+        _mockSender.Setup(x => x.Send(It.Is<UpdateMemberCommand>(c =>
+                c.Id == id &&
+                c.FirstName == command.FirstName &&
+                c.LastName == command.LastName &&
+                c.Email == command.Email &&
+                c.PhoneNumber == command.PhoneNumber &&
+                c.MemberType == command.MemberType &&
+                c.BirthDate == command.BirthDate &&
+                c.KnownPathologies == command.KnownPathologies),
+            It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var result = await _membersEndpoint.UpdateMember(_mockSender.Object, id, command);
+
+        result.Should().BeOfType<Results<NoContent, NotFound>>();
+        _mockSender.Verify(x => x.Send(It.Is<UpdateMemberCommand>(c => c.Id == id), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task DeleteMember_Should_Call_Sender_With_Command_And_Return_NoContent()
+    {
+        var id = Guid.NewGuid();
+
+        _mockSender.Setup(x => x.Send(It.Is<DeleteMemberCommand>(c => c.Id == id), It.IsAny<CancellationToken>()))
+                   .Returns(Task.CompletedTask);
+
+        var result = await _membersEndpoint.DeleteMember(_mockSender.Object, id);
+
+        result.Should().BeOfType<Results<NoContent, NotFound>>();
+        _mockSender.Verify(x => x.Send(It.Is<DeleteMemberCommand>(c => c.Id == id), It.IsAny<CancellationToken>()), Times.Once);
     }
 }
 

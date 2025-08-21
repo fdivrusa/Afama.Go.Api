@@ -2,6 +2,7 @@ using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Application.Members.Commands;
 using Afama.Go.Api.Domain.Entities;
 using Afama.Go.Api.Domain.Enums;
+using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -15,6 +16,7 @@ public class CreateMemberCommandHandlerTests
     private Mock<IApplicationDbContext> _mockContext;
     private Mock<DbSet<Member>> _mockMembersDbSet;
     private CreateMemberCommandHandler _handler;
+    private IMapper _mapper;
 
     [SetUp]
     public void SetUp()
@@ -26,7 +28,10 @@ public class CreateMemberCommandHandlerTests
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
                    .ReturnsAsync(1);
 
-        _handler = new CreateMemberCommandHandler(_mockContext.Object);
+        var configuration = new MapperConfiguration(cfg => cfg.CreateMap<CreateMemberCommand, Member>());
+        _mapper = configuration.CreateMapper();
+
+        _handler = new CreateMemberCommandHandler(_mockContext.Object, _mapper);
     }
 
     private static void AssertMemberPropertiesMatch(Member member, CreateMemberCommand command)
