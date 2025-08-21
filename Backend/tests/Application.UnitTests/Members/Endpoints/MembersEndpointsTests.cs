@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using NUnit.Framework;
+using Ardalis.GuardClauses;
 
 namespace Afama.Go.Api.Application.UnitTests.Members.Endpoints;
 
@@ -101,10 +102,8 @@ public class MembersEndpointsTests
         var result = await _membersEndpoint.GetMemberDetails(_mockSender.Object, memberId);
 
         // Assert
-        result.Should().BeOfType<Results<Ok<MemberDetailsDto>, NotFound>>();
-        var okResult = result.Result as Ok<MemberDetailsDto>;
-        okResult.Should().NotBeNull();
-        okResult!.Value.Should().BeEquivalentTo(expectedMemberDetails);
+        result.Should().BeOfType<Ok<MemberDetailsDto>>();
+        result.Value.Should().BeEquivalentTo(expectedMemberDetails);
 
         _mockSender.Verify(x => x.Send(It.Is<GetMemberDetailsQuery>(q => q.MemberId == memberId), It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -128,6 +127,28 @@ public class MembersEndpointsTests
         await _membersEndpoint.GetMemberDetails(_mockSender.Object, memberId);
 
         // Assert
+        _mockSender.Verify(x => x.Send(
+            It.Is<GetMemberDetailsQuery>(q => q.MemberId == memberId),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Test]
+    public async Task GetMemberDetails_Should_Relay_NotFoundException_When_Member_Does_Not_Exist()
+    {
+        // Arrange
+        var memberId = Guid.NewGuid();
+        var exception = new NotFoundException("Member", memberId.ToString());
+
+        _mockSender.Setup(x => x.Send(
+                It.Is<GetMemberDetailsQuery>(q => q.MemberId == memberId),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(exception);
+
+        // Act
+        var act = () => _membersEndpoint.GetMemberDetails(_mockSender.Object, memberId);
+
+        // Assert
+        await act.Should().ThrowAsync<NotFoundException>();
         _mockSender.Verify(x => x.Send(
             It.Is<GetMemberDetailsQuery>(q => q.MemberId == memberId),
             It.IsAny<CancellationToken>()), Times.Once);
