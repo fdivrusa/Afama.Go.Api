@@ -23,11 +23,10 @@ public class Members : EndpointGroupBase
         return TypedResults.Ok(members);
     }
 
-    public async Task<Results<Ok<MemberDetailsDto>, NotFound>> GetMemberDetails(ISender sender, Guid id)
+    public async Task<Ok<MemberDetailsDto>> GetMemberDetails(ISender sender, Guid id)
     {
         var query = new GetMemberDetailsQuery { MemberId = id };
-        var memberDetails = await sender.Send(query);
-        return TypedResults.Ok(memberDetails);
+        return TypedResults.Ok(await sender.Send(query));
     }
 
     public async Task<Created<Guid>> CreateMember(ISender sender, CreateMemberCommand command)
