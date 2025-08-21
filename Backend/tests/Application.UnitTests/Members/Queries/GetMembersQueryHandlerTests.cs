@@ -107,4 +107,38 @@ public class GetMembersQueryHandlerTests
         // Assert
         result.Should().ContainSingle(m => m.LastName == "Smith");
     }
+
+    [Test]
+    public async Task Handle_Should_Return_All_Members_When_No_Filters()
+    {
+        // Arrange
+        _context.Members.AddRange(
+            new Member
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Alice",
+                LastName = "Smith",
+                Email = "alice@example.com",
+                PhoneNumber = "+123",
+                MemberType = MemberType.Student
+            },
+            new Member
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Bob",
+                LastName = "Jones",
+                Email = "bob@example.com",
+                PhoneNumber = "+456",
+                MemberType = MemberType.Student
+            });
+        await _context.SaveChangesAsync();
+
+        var query = new GetMembersQuery();
+
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.Should().HaveCount(2);
+    }
 }
