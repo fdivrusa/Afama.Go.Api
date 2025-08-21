@@ -34,6 +34,17 @@ public class CreateMemberCommandHandlerTests
         _handler = new CreateMemberCommandHandler(_mockContext.Object, _mapper);
     }
 
+    private static void AssertMemberPropertiesMatch(Member member, CreateMemberCommand command)
+    {
+        member.FirstName.Should().Be(command.FirstName);
+        member.LastName.Should().Be(command.LastName);
+        member.Email.Should().Be(command.Email);
+        member.PhoneNumber.Should().Be(command.PhoneNumber);
+        member.MemberType.Should().Be(command.MemberType);
+        member.BirthDate.Should().Be(command.BirthDate);
+        member.KnownPathologies.Should().Be(command.KnownPathologies);
+    }
+
     [Test]
     public async Task Handle_Should_Create_Member_With_Correct_Properties()
     {
@@ -64,14 +75,8 @@ public class CreateMemberCommandHandlerTests
         // Assert
         result.Should().NotBeEmpty();
         capturedMember.Should().NotBeNull();
-        capturedMember!.FirstName.Should().Be(command.FirstName);
-        capturedMember.LastName.Should().Be(command.LastName);
-        capturedMember.Email.Should().Be(command.Email);
-        capturedMember.PhoneNumber.Should().Be(command.PhoneNumber);
-        capturedMember.MemberType.Should().Be(command.MemberType);
-        capturedMember.BirthDate.Should().Be(command.BirthDate);
-        capturedMember.KnownPathologies.Should().Be(command.KnownPathologies);
-        capturedMember.Id.Should().NotBeEmpty();
+        AssertMemberPropertiesMatch(capturedMember!, command);
+        capturedMember!.Id.Should().NotBeEmpty();
         result.Should().Be(capturedMember.Id);
     }
 
@@ -194,5 +199,40 @@ public class CreateMemberCommandHandlerTests
 
         // Assert
         _mockContext.Verify(x => x.SaveChangesAsync(cancellationToken), Times.Once);
+    }
+
+    [Test]
+    public async Task Handle_Should_Create_Member_With_All_Properties_Set()
+    {
+        // Arrange
+        var command = new CreateMemberCommand
+        {
+            FirstName = "Alice",
+            LastName = "Johnson",
+            Email = "alice.johnson@example.com",
+            PhoneNumber = "+9876543210",
+            MemberType = MemberType.Teacher,
+            BirthDate = new DateTime(1985, 3, 15),
+            KnownPathologies = "Allergies to peanuts"
+        };
+
+        Member? capturedMember = null;
+        _mockMembersDbSet.Setup(x => x.Add(It.IsAny<Member>()))
+                        .Callback<Member>(m =>
+                        {
+                            if (m.Id == Guid.Empty)
+                                m.Id = Guid.NewGuid();
+                            capturedMember = m;
+                        });
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeEmpty();
+        capturedMember.Should().NotBeNull();
+        AssertMemberPropertiesMatch(capturedMember!, command);
+        capturedMember!.Id.Should().NotBeEmpty();
+        result.Should().Be(capturedMember.Id);
     }
 }
