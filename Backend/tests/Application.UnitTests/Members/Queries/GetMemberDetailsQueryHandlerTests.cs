@@ -2,7 +2,6 @@ using Afama.Go.Api.Application.Members.Queries.GetMemberDetails;
 using Afama.Go.Api.Domain.Entities;
 using Afama.Go.Api.Domain.Enums;
 using Afama.Go.Api.Infrastructure.Data;
-using Ardalis.GuardClauses;
 using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
