@@ -11,6 +11,7 @@ public static class DependencyInjection
 {
     public static void AddInfrastructureServices(this IHostApplicationBuilder builder)
     {
+        Guard.Against.Null(builder, nameof(builder));
         var connectionString = builder.Configuration.GetConnectionString("Afama.Go.ApiDb");
         Guard.Against.Null(connectionString, message: "Connection string 'Afama.Go.ApiDb' not found.");
 
@@ -20,16 +21,7 @@ public static class DependencyInjection
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            
-            // Use InMemory database for development/testing, SQL Server for production
-            if (builder.Environment.IsDevelopment())
-            {
-                options.UseInMemoryDatabase("AfamaGo_Development");
-            }
-            else
-            {
-                options.UseSqlServer(connectionString);
-            }
+            options.UseSqlServer(connectionString);
         });
 
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());

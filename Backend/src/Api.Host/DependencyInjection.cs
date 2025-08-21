@@ -5,6 +5,7 @@ using Afama.Go.Api.Application.Members.Commands;
 using AutoMapper;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Afama.Go.Api.Host.Common;
 
 namespace Microsoft.Extensions.DependencyInjection;
 public static class DependencyInjection
@@ -32,7 +33,7 @@ public static class DependencyInjection
 
     public static void AddAzureAppConfiguration(this IHostApplicationBuilder builder)
     {
-        if (!builder.Environment.IsDevelopment())
+        if (!builder.Environment.IsLocal())
         {
             var azAppConfigUri = new Uri($"https://{builder.Configuration["AzureAppConfig:InstanceName"]}.azconfig.io");
             builder.Configuration.AddAzureAppConfiguration(options => options.Connect(azAppConfigUri, new ManagedIdentityCredential())

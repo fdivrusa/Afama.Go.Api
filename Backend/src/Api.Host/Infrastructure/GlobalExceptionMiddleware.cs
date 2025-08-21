@@ -1,5 +1,5 @@
 using System.Text.Json;
-using FluentValidation;
+using Afama.Go.Api.Host.Common;
 
 namespace Afama.Go.Api.Host.Infrastructure;
 
@@ -32,16 +32,7 @@ public class GlobalExceptionMiddleware
     {
         var (statusCode, errorCode) = GetErrorDetails(exception);
 
-        var errorResponse = new ErrorResponse
-        {
-            Message = GetUserFriendlyMessage(exception),
-            Code = errorCode,
-            Path = context.Request.Path,
-            Method = context.Request.Method,
-            Timestamp = DateTime.UtcNow,
-            RequestId = context.TraceIdentifier,
-            StackTrace = _environment.IsDevelopment() ? exception.StackTrace : null
-        };
+        var errorResponse = CreateErrorResponse(exception, context);
 
         _logger.LogError(exception,
             "Unhandled exception for {Method} {Path} by {User}. Error: {ErrorCode}",
@@ -56,11 +47,69 @@ public class GlobalExceptionMiddleware
         var options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = _environment.IsDevelopment()
+            WriteIndented = ShouldIncludeStackTrace()
         };
 
         var json = JsonSerializer.Serialize(errorResponse, options);
         await context.Response.WriteAsync(json);
+    }
+
+    private object CreateErrorResponse(Exception exception, HttpContext context)
+    {
+        var (statusCode, errorCode) = GetErrorDetails(exception);
+
+        // Handle validation exceptions with detailed field errors
+        if (exception is Application.Common.Exceptions.ValidationException validationException)
+        {
+            return new ValidationErrorResponse
+            {
+                Message = "One or more validation errors occurred.",
+                Code = errorCode,
+                Path = context.Request.Path,
+                Method = context.Request.Method,
+                Timestamp = DateTime.UtcNow,
+                RequestId = context.TraceIdentifier,
+                Errors = validationException.Errors,
+                StackTrace = ShouldIncludeStackTrace() ? exception.StackTrace : null
+            };
+        }
+
+        // Handle FluentValidation exceptions
+        if (exception is FluentValidation.ValidationException fluentValidationException)
+        {
+            var errors = fluentValidationException.Errors
+                .GroupBy(e => e.PropertyName, e => e.ErrorMessage)
+                .ToDictionary(failureGroup => failureGroup.Key, failureGroup => failureGroup.ToArray());
+
+            return new ValidationErrorResponse
+            {
+                Message = "One or more validation errors occurred.",
+                Code = errorCode,
+                Path = context.Request.Path,
+                Method = context.Request.Method,
+                Timestamp = DateTime.UtcNow,
+                RequestId = context.TraceIdentifier,
+                Errors = errors,
+                StackTrace = ShouldIncludeStackTrace() ? exception.StackTrace : null
+            };
+        }
+
+        // Default error response for other exceptions
+        return new ErrorResponse
+        {
+            Message = GetUserFriendlyMessage(exception),
+            Code = errorCode,
+            Path = context.Request.Path,
+            Method = context.Request.Method,
+            Timestamp = DateTime.UtcNow,
+            RequestId = context.TraceIdentifier,
+            StackTrace = ShouldIncludeStackTrace() ? exception.StackTrace : null
+        };
+    }
+
+    private bool ShouldIncludeStackTrace()
+    {
+        return _environment.IsLocal() || _environment.IsDevelopment() || _environment.IsStaging();
     }
 
     private static (int statusCode, string errorCode) GetErrorDetails(Exception exception)
@@ -70,7 +119,8 @@ public class GlobalExceptionMiddleware
             ArgumentNullException => (400, "InvalidArgument"),
             ArgumentException => (400, "InvalidArgument"),
             InvalidOperationException => (400, "InvalidOperation"),
-            ValidationException => (400, "ValidationFailed"),
+            FluentValidation.ValidationException => (400, "ValidationFailed"),
+            Application.Common.Exceptions.ValidationException => (400, "ValidationFailed"),
             UnauthorizedAccessException => (401, "Unauthorized"),
             KeyNotFoundException => (404, "NotFound"),
             NotImplementedException => (501, "NotImplemented"),
@@ -88,7 +138,8 @@ public class GlobalExceptionMiddleware
             ArgumentNullException => "Required parameter is missing.",
             ArgumentException => "Invalid request parameters.",
             InvalidOperationException => "The requested operation is not valid.",
-            ValidationException validationEx => validationEx.Message,
+            FluentValidation.ValidationException => "One or more validation errors occurred.",
+            Application.Common.Exceptions.ValidationException => "One or more validation errors occurred.",
             UnauthorizedAccessException => "Access denied.",
             KeyNotFoundException => "The requested resource was not found.",
             NotImplementedException => "This feature is not yet implemented.",
@@ -109,4 +160,9 @@ public record ErrorResponse
     public DateTime Timestamp { get; init; }
     public string RequestId { get; init; } = string.Empty;
     public string? StackTrace { get; init; }
+}
+
+public record ValidationErrorResponse : ErrorResponse
+{
+    public IDictionary<string, string[]> Errors { get; init; } = new Dictionary<string, string[]>();
 }

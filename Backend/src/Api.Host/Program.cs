@@ -79,7 +79,7 @@ try
     var app = builder.Build();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
+    if (!app.Environment.IsProduction())
     {
         await app.InitialiseDatabaseAsync();
         app.UseSwagger();
@@ -115,7 +115,7 @@ try
     });
 
     app.UseSerilogRequestLogging();
-    
+
     app.UseMiddleware<GlobalExceptionMiddleware>();
 
     app.MapEndpoints();
