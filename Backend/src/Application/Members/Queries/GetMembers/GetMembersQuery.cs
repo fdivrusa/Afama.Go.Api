@@ -1,4 +1,5 @@
-﻿using Afama.Go.Api.Application.Common.Interfaces;
+using System;
+using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Domain.Enums;
 
 namespace Afama.Go.Api.Application.Members.Queries.GetMembers;
@@ -17,11 +18,11 @@ public class GetMembersQueryHandler(IApplicationDbContext context, IMapper mappe
         var query = context.Members.AsQueryable();
         if (!string.IsNullOrEmpty(request.FirstName))
         {
-            query = query.Where(m => m.FirstName.Contains(request.FirstName));
+            query = query.Where(m => m.FirstName != null && m.FirstName.Contains(request.FirstName, StringComparison.OrdinalIgnoreCase));
         }
         if (!string.IsNullOrEmpty(request.LastName))
         {
-            query = query.Where(m => m.LastName.Contains(request.LastName));
+            query = query.Where(m => m.LastName != null && m.LastName.Contains(request.LastName, StringComparison.OrdinalIgnoreCase));
         }
         if (request.MemberType.HasValue)
         {
