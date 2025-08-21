@@ -73,4 +73,38 @@ public class GetMembersQueryHandlerTests
         // Assert
         result.Should().ContainSingle(m => m.FirstName == "Alice");
     }
+
+    [Test]
+    public async Task Handle_Should_Filter_LastName_Ignoring_Case()
+    {
+        // Arrange
+        _context.Members.AddRange(
+            new Member
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Alice",
+                LastName = "Smith",
+                Email = "alice@example.com",
+                PhoneNumber = "+123",
+                MemberType = MemberType.Student
+            },
+            new Member
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Bob",
+                LastName = "Jones",
+                Email = "bob@example.com",
+                PhoneNumber = "+456",
+                MemberType = MemberType.Student
+            });
+        await _context.SaveChangesAsync();
+
+        var query = new GetMembersQuery { LastName = "sMiTh" };
+
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.Should().ContainSingle(m => m.LastName == "Smith");
+    }
 }
