@@ -55,7 +55,7 @@ public class DeleteMemberCommandHandlerTests
     }
 
     [Test]
-    public async Task Handle_Should_Throw_NotFound_When_Member_Not_Exist()
+    public async Task Handle_Should_Throw_NotFound_When_Member_Does_Not_Exist()
     {
         var command = new DeleteMemberCommand(Guid.NewGuid());
         var act = () => _handler.Handle(command, CancellationToken.None);
