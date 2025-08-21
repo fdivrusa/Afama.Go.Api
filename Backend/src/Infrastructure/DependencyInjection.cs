@@ -20,7 +20,16 @@ public static class DependencyInjection
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseSqlServer(connectionString);
+            
+            // Use InMemory database for development/testing, SQL Server for production
+            if (builder.Environment.IsDevelopment())
+            {
+                options.UseInMemoryDatabase("AfamaGo_Development");
+            }
+            else
+            {
+                options.UseSqlServer(connectionString);
+            }
         });
 
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
