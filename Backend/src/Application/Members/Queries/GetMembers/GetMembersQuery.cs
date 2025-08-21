@@ -17,11 +17,13 @@ public class GetMembersQueryHandler(IApplicationDbContext context, IMapper mappe
         var query = context.Members.AsQueryable();
         if (!string.IsNullOrEmpty(request.FirstName))
         {
-            query = query.Where(m => m.FirstName.Contains(request.FirstName));
+            var firstName = request.FirstName.ToLower();
+            query = query.Where(m => m.FirstName.ToLower().Contains(firstName));
         }
         if (!string.IsNullOrEmpty(request.LastName))
         {
-            query = query.Where(m => m.LastName.Contains(request.LastName));
+            var lastName = request.LastName.ToLower();
+            query = query.Where(m => m.LastName.ToLower().Contains(lastName));
         }
         if (request.MemberType.HasValue)
         {
