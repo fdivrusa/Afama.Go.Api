@@ -2,6 +2,7 @@ using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Application.Members.Commands;
 using Afama.Go.Api.Domain.Entities;
 using Afama.Go.Api.Domain.Enums;
+using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -15,6 +16,7 @@ public class CreateMemberCommandHandlerTests
     private Mock<IApplicationDbContext> _mockContext;
     private Mock<DbSet<Member>> _mockMembersDbSet;
     private CreateMemberCommandHandler _handler;
+    private IMapper _mapper;
 
     [SetUp]
     public void SetUp()
@@ -26,7 +28,21 @@ public class CreateMemberCommandHandlerTests
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
                    .ReturnsAsync(1);
 
-        _handler = new CreateMemberCommandHandler(_mockContext.Object);
+        var configuration = new MapperConfiguration(cfg => cfg.CreateMap<CreateMemberCommand, Member>());
+        _mapper = configuration.CreateMapper();
+
+        _handler = new CreateMemberCommandHandler(_mockContext.Object, _mapper);
+    }
+
+    private static void AssertMemberPropertiesMatch(Member member, CreateMemberCommand command)
+    {
+        member.FirstName.Should().Be(command.FirstName);
+        member.LastName.Should().Be(command.LastName);
+        member.Email.Should().Be(command.Email);
+        member.PhoneNumber.Should().Be(command.PhoneNumber);
+        member.MemberType.Should().Be(command.MemberType);
+        member.BirthDate.Should().Be(command.BirthDate);
+        member.KnownPathologies.Should().Be(command.KnownPathologies);
     }
 
     [Test]
@@ -59,14 +75,8 @@ public class CreateMemberCommandHandlerTests
         // Assert
         result.Should().NotBeEmpty();
         capturedMember.Should().NotBeNull();
-        capturedMember!.FirstName.Should().Be(command.FirstName);
-        capturedMember.LastName.Should().Be(command.LastName);
-        capturedMember.Email.Should().Be(command.Email);
-        capturedMember.PhoneNumber.Should().Be(command.PhoneNumber);
-        capturedMember.MemberType.Should().Be(command.MemberType);
-        capturedMember.BirthDate.Should().Be(command.BirthDate);
-        capturedMember.KnownPathologies.Should().Be(command.KnownPathologies);
-        capturedMember.Id.Should().NotBeEmpty();
+        AssertMemberPropertiesMatch(capturedMember!, command);
+        capturedMember!.Id.Should().NotBeEmpty();
         result.Should().Be(capturedMember.Id);
     }
 
@@ -189,5 +199,40 @@ public class CreateMemberCommandHandlerTests
 
         // Assert
         _mockContext.Verify(x => x.SaveChangesAsync(cancellationToken), Times.Once);
+    }
+
+    [Test]
+    public async Task Handle_Should_Create_Member_With_All_Properties_Set()
+    {
+        // Arrange
+        var command = new CreateMemberCommand
+        {
+            FirstName = "Alice",
+            LastName = "Johnson",
+            Email = "alice.johnson@example.com",
+            PhoneNumber = "+9876543210",
+            MemberType = MemberType.Teacher,
+            BirthDate = new DateTime(1985, 3, 15),
+            KnownPathologies = "Allergies to peanuts"
+        };
+
+        Member? capturedMember = null;
+        _mockMembersDbSet.Setup(x => x.Add(It.IsAny<Member>()))
+                        .Callback<Member>(m =>
+                        {
+                            if (m.Id == Guid.Empty)
+                                m.Id = Guid.NewGuid();
+                            capturedMember = m;
+                        });
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.Should().NotBeEmpty();
+        capturedMember.Should().NotBeNull();
+        AssertMemberPropertiesMatch(capturedMember!, command);
+        capturedMember!.Id.Should().NotBeEmpty();
+        result.Should().Be(capturedMember.Id);
     }
 }
