@@ -1,13 +1,15 @@
-﻿using Afama.Go.Api.Application.Common.Interfaces;
+using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Domain.Entities;
 using Afama.Go.Api.Domain.Enums;
-
+using Ardalis.GuardClauses;
 using AutoMapper;
 using Afama.Go.Api.Application.Common.Mappings;
 
 namespace Afama.Go.Api.Application.Members.Commands;
-public record CreateMemberCommand : IRequest<Guid>
+
+public record UpdateMemberCommand : IRequest
 {
+    public Guid Id { get; init; }
     public string FirstName { get; init; } = string.Empty;
     public string LastName { get; init; } = string.Empty;
     public string Email { get; init; } = string.Empty;
@@ -15,22 +17,28 @@ public record CreateMemberCommand : IRequest<Guid>
     public MemberType MemberType { get; init; } = MemberType.Other;
     public DateTime? BirthDate { get; init; } = null;
     public string? KnownPathologies { get; init; } = null;
+
     public class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<CreateMemberCommand, Member>().IgnoreAuditableEntity();
+            CreateMap<UpdateMemberCommand, Member>().IgnoreAuditableEntity();
         }
     }
 }
 
-public class CreateMemberCommandHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<CreateMemberCommand, Guid>
+public class UpdateMemberCommandHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<UpdateMemberCommand>
 {
-    public async Task<Guid> Handle(CreateMemberCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateMemberCommand request, CancellationToken cancellationToken)
     {
-        var member = mapper.Map<Member>(request);
-        context.Members.Add(member);
+        var member = await context.Members.FindAsync(new object?[] { request.Id }, cancellationToken);
+        if (member == null)
+        {
+            throw new NotFoundException(nameof(Member), request.Id.ToString());
+        }
+
+        mapper.Map(request, member);
+
         await context.SaveChangesAsync(cancellationToken);
-        return member.Id;
     }
 }

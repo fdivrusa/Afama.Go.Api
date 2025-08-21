@@ -1,6 +1,8 @@
 ﻿using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Infrastructure.Data;
 using Afama.Go.Api.Host.Services;
+using Afama.Go.Api.Application.Members.Commands;
+using AutoMapper;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +22,7 @@ public static class DependencyInjection
             options.SuppressModelStateInvalidFilter = true);
 
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddAutoMapper(typeof(Program), typeof(CreateMemberCommand));
 
         builder.Services.AddOpenApiDocument((configure, sp) =>
         {

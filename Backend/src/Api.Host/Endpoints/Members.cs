@@ -14,7 +14,9 @@ public class Members : EndpointGroupBase
             .RequireAuthorization()
             .MapGet(GetMembers)
             .MapGet(GetMemberDetails, "{id}")
-            .MapPost(CreateMember);
+            .MapPost(CreateMember)
+            .MapPut(UpdateMember, "{id}")
+            .MapDelete(DeleteMember, "{id}");
     }
 
     public async Task<Ok<IEnumerable<MemberBriefDto>>> GetMembers(ISender sender, [AsParameters] GetMembersQuery query)
@@ -34,5 +36,18 @@ public class Members : EndpointGroupBase
     {
         var memberId = await sender.Send(command);
         return TypedResults.Created($"/{nameof(Members)}/{memberId}", memberId);
+    }
+
+    public async Task<Results<NoContent, NotFound>> UpdateMember(ISender sender, Guid id, UpdateMemberCommand command)
+    {
+        command = command with { Id = id };
+        await sender.Send(command);
+        return TypedResults.NoContent();
+    }
+
+    public async Task<Results<NoContent, NotFound>> DeleteMember(ISender sender, Guid id)
+    {
+        await sender.Send(new DeleteMemberCommand(id));
+        return TypedResults.NoContent();
     }
 }
