@@ -1,14 +1,14 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
 using Afama.Go.Api.Application.Common.Interfaces;
-using Afama.Go.Api.Domain.Common;
-using Afama.Go.Api.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Afama.Go.Api.Infrastructure.Data;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
 {
     public DbSet<Member> Members => Set<Member>();
+    public DbSet<Club> Clubs => Set<Club>();
+    public DbSet<CourseTeacher> CourseTeachers => Set<CourseTeacher>();
+    public DbSet<Course> Courses => Set<Course>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

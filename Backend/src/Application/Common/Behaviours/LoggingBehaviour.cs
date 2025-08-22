@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Afama.Go.Api.Application.Common.Interfaces;
+﻿using Afama.Go.Api.Application.Common.Interfaces;
 using MediatR.Pipeline;
 using Microsoft.Extensions.Logging;
 

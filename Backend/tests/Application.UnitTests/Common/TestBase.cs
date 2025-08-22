@@ -1,6 +1,6 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Linq.Expressions;
 
 namespace Afama.Go.Api.Application.UnitTests.Common;
 
@@ -18,7 +18,7 @@ public abstract class TestBase
 
         // Mock async methods for Entity Framework
         mockSet.Setup(x => x.FindAsync(It.IsAny<object[]>()))
-               .Returns<object[]>(keyValues => 
+               .Returns<object[]>(keyValues =>
                {
                    var entity = data.FirstOrDefault();
                    return new ValueTask<T?>(entity);

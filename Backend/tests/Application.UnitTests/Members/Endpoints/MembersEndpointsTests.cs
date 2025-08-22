@@ -1,13 +1,12 @@
 using Afama.Go.Api.Application.Members.Commands;
 using Afama.Go.Api.Application.Members.Queries.GetMemberDetails;
 using Afama.Go.Api.Application.Members.Queries.GetMembers;
-using Afama.Go.Api.Host.Endpoints;
-using MembersEndpoint = Afama.Go.Api.Host.Endpoints.Members;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using NUnit.Framework;
+using MembersEndpoint = Afama.Go.Api.Host.Endpoints.Members;
 
 namespace Afama.Go.Api.Application.UnitTests.Members.Endpoints;
 

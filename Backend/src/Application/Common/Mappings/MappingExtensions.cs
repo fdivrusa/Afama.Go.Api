@@ -1,8 +1,5 @@
 using Afama.Go.Api.Application.Common.Models;
 using Afama.Go.Api.Domain.Common;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace Afama.Go.Api.Application.Common.Mappings;
 

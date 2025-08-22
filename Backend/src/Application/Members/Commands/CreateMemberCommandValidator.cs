@@ -1,8 +1,14 @@
-﻿namespace Afama.Go.Api.Application.Members.Commands;
+﻿using Afama.Go.Api.Application.Common.Interfaces;
+
+namespace Afama.Go.Api.Application.Members.Commands;
 public class CreateMemberCommandValidator : AbstractValidator<CreateMemberCommand>
 {
-    public CreateMemberCommandValidator()
+    private readonly IApplicationDbContext _context;
+
+    public CreateMemberCommandValidator(IApplicationDbContext context)
     {
+        _context = context;
+
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage(string.Format(Translations.IsRequiredMessage, nameof(CreateMemberCommand.FirstName)))
             .MaximumLength(64).WithMessage(string.Format(Translations.MustNotExceedCharactersMessage, nameof(CreateMemberCommand.FirstName), 64));
@@ -15,6 +21,10 @@ public class CreateMemberCommandValidator : AbstractValidator<CreateMemberComman
             .NotEmpty().WithMessage(string.Format(Translations.IsRequiredMessage, nameof(CreateMemberCommand.Email)))
             .EmailAddress().WithMessage(string.Format(Translations.EmailNotValidMessage, nameof(CreateMemberCommand.Email)))
             .MaximumLength(256).WithMessage(string.Format(Translations.MustNotExceedCharactersMessage, nameof(CreateMemberCommand.Email), 256));
+
+        RuleFor(x => x.Email)
+            .MustAsync(async (email, cancellation) => !await _context.Members.AnyAsync(m => m.Email == email, cancellation))
+            .WithMessage(string.Format(Translations.AlreadyExistsMessage, nameof(CreateMemberCommand.Email)));
 
         RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage(string.Format(Translations.IsRequiredMessage, nameof(CreateMemberCommand.PhoneNumber)))

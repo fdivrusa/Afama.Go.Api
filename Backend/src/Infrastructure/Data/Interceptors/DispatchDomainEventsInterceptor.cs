@@ -1,6 +1,4 @@
-﻿using Afama.Go.Api.Domain.Common;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Afama.Go.Api.Infrastructure.Data.Interceptors;

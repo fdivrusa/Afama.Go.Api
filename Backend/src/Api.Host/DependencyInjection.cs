@@ -1,11 +1,10 @@
 ﻿using Afama.Go.Api.Application.Common.Interfaces;
-using Afama.Go.Api.Infrastructure.Data;
-using Afama.Go.Api.Host.Services;
 using Afama.Go.Api.Application.Members.Commands;
-using AutoMapper;
+using Afama.Go.Api.Host.Common;
+using Afama.Go.Api.Host.Services;
+using Afama.Go.Api.Infrastructure.Data;
 using Azure.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Afama.Go.Api.Host.Common;
 
 namespace Microsoft.Extensions.DependencyInjection;
 public static class DependencyInjection

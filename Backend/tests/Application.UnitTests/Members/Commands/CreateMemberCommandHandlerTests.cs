@@ -23,7 +23,7 @@ public class CreateMemberCommandHandlerTests
     {
         _mockContext = new Mock<IApplicationDbContext>();
         _mockMembersDbSet = new Mock<DbSet<Member>>();
-        
+
         _mockContext.Setup(x => x.Members).Returns(_mockMembersDbSet.Object);
         _mockContext.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
                    .ReturnsAsync(1);
@@ -62,7 +62,7 @@ public class CreateMemberCommandHandlerTests
 
         Member? capturedMember = null;
         _mockMembersDbSet.Setup(x => x.Add(It.IsAny<Member>()))
-                        .Callback<Member>(m => 
+                        .Callback<Member>(m =>
                         {
                             if (m.Id == Guid.Empty)
                                 m.Id = Guid.NewGuid();

@@ -1,6 +1,4 @@
 ﻿using Afama.Go.Api.Application.Common.Interfaces;
-using Afama.Go.Api.Domain.Common;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 

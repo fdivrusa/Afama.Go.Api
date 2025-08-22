@@ -61,6 +61,15 @@ namespace Afama.Go.Api.Application {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} already exists.
+        /// </summary>
+        internal static string AlreadyExistsMessage {
+            get {
+                return ResourceManager.GetString("AlreadyExistsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} must be in the past.
         /// </summary>
         internal static string DateMustBeInPastMessage {

@@ -1,7 +1,6 @@
 ﻿using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Infrastructure.Data;
 using Afama.Go.Api.Infrastructure.Data.Interceptors;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -20,8 +19,8 @@ public static class DependencyInjection
 
         builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
-            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
             options.UseSqlServer(connectionString);
+            options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
         });
 
         builder.Services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());

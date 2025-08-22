@@ -1,9 +1,7 @@
 using Afama.Go.Api.Application.Common.Interfaces;
+using Afama.Go.Api.Application.Common.Mappings;
 using Afama.Go.Api.Domain.Entities;
 using Afama.Go.Api.Domain.Enums;
-using Ardalis.GuardClauses;
-using AutoMapper;
-using Afama.Go.Api.Application.Common.Mappings;
 
 namespace Afama.Go.Api.Application.Members.Commands;
 

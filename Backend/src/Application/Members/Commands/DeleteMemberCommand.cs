@@ -1,6 +1,5 @@
 using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Domain.Entities;
-using Ardalis.GuardClauses;
 
 namespace Afama.Go.Api.Application.Members.Commands;
 

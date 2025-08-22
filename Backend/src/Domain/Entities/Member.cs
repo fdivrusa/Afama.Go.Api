@@ -1,7 +1,4 @@
-﻿using Afama.Go.Api.Domain.Common;
-using Afama.Go.Api.Domain.Enums;
-
-namespace Afama.Go.Api.Domain.Entities;
+﻿namespace Afama.Go.Api.Domain.Entities;
 public class Member : BaseAuditableEntity
 {
     public string FirstName { get; set; } = default!;
@@ -11,4 +8,6 @@ public class Member : BaseAuditableEntity
     public string PhoneNumber { get; set; } = default!;
     public MemberType MemberType { get; set; } = MemberType.Student;
     public string? KnownPathologies { get; set; }
+
+    public ICollection<Club> Clubs { get; set; } = [];
 }

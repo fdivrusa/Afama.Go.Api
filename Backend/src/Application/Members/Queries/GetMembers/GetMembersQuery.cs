@@ -1,4 +1,3 @@
-using System;
 using Afama.Go.Api.Application.Common.Interfaces;
 using Afama.Go.Api.Domain.Enums;
 

@@ -1,9 +1,16 @@
+using Afama.Go.Api.Application.Common.Interfaces;
+
 namespace Afama.Go.Api.Application.Members.Commands;
 
 public class UpdateMemberCommandValidator : AbstractValidator<UpdateMemberCommand>
 {
-    public UpdateMemberCommandValidator()
+
+    private readonly IApplicationDbContext _context;
+
+    public UpdateMemberCommandValidator(IApplicationDbContext context)
     {
+        _context = context;
+
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage(string.Format(Translations.IsRequiredMessage, nameof(UpdateMemberCommand.Id)));
 
@@ -44,5 +51,9 @@ public class UpdateMemberCommandValidator : AbstractValidator<UpdateMemberComman
         RuleFor(x => x.BirthDate)
             .LessThan(DateTime.UtcNow).When(x => x.BirthDate.HasValue)
             .WithMessage(string.Format(Translations.DateMustBeInPastMessage, nameof(UpdateMemberCommand.BirthDate)));
+
+        RuleFor(x => x)
+            .MustAsync(async (command, cancellation) =>
+            !await _context.Members.AnyAsync(m => m.Email == command.Email && m.Id != command.Id, cancellation));
     }
 }

@@ -1,7 +1,4 @@
-﻿using Afama.Go.Api.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-
-namespace Afama.Go.Api.Infrastructure.Data.Configurations;
+﻿namespace Afama.Go.Api.Infrastructure.Data.Configurations;
 public class MemberConfiguration : IEntityTypeConfiguration<Member>
 {
     public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Member> builder)
@@ -23,5 +20,8 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.Property(m => m.KnownPathologies)
             .IsRequired(false)
             .HasMaxLength(2048);
+
+        builder.HasIndex(m => m.Email)
+        .IsUnique();
     }
 }
