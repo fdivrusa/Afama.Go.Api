@@ -17,7 +17,8 @@ public record CreateMemberCommand : IRequest<Guid>
     {
         public Mapping()
         {
-            CreateMap<CreateMemberCommand, Member>().IgnoreAuditableEntity();
+            CreateMap<CreateMemberCommand, Member>().IgnoreAuditableEntity()
+                .ForMember(dest => dest.Clubs, opt => opt.Ignore());
         }
     }
 }

@@ -20,7 +20,8 @@ public record UpdateMemberCommand : IRequest
     {
         public Mapping()
         {
-            CreateMap<UpdateMemberCommand, Member>().IgnoreAuditableEntity();
+            CreateMap<UpdateMemberCommand, Member>().IgnoreAuditableEntity()
+                .ForMember(dest => dest.Clubs, opt => opt.Ignore());
         }
     }
 }
