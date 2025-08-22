@@ -7,7 +7,7 @@
         {
             if (ReferenceEquals(left, right)) return true;
             if (left is null || right is null) return false;
-            return left.Equals(right);                      
+            return left.Equals(right);
         }
 
         protected static bool NotEqualOperator(ValueObject? left, ValueObject? right)
@@ -15,7 +15,7 @@
 
         protected abstract IEnumerable<object?> GetEqualityComponents();
 
-        public sealed override bool Equals(object? obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(this, obj)) return true;
             if (obj is null || obj.GetType() != GetType()) return false;
@@ -24,7 +24,7 @@
             return GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
         }
 
-        public sealed override int GetHashCode()
+        public override int GetHashCode()
         {
             var hash = new HashCode();
             foreach (var component in GetEqualityComponents())

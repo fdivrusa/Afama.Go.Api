@@ -26,7 +26,11 @@ public class TestValueObjectTests
         public static bool operator ==(TestValueObject? left, TestValueObject? right) => EqualOperator(left!, right!);
         public static bool operator !=(TestValueObject? left, TestValueObject? right) => NotEqualOperator(left!, right!);
 
-        public override bool Equals(object? obj) => base.Equals(obj);
+        public override bool Equals(object? obj)
+        {
+            return base.Equals(obj);
+        }
+
         public override int GetHashCode() => base.GetHashCode();
     }
 
